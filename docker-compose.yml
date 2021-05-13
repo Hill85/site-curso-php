@@ -1,0 +1,47 @@
+version: '3.4'
+services: 
+     php:
+       image: vultr-php
+       volumes:
+          - ./:/app
+          - "/etc/localtime:/etc/localtime:ro"
+       working_dir: /app
+       restart: always
+       networks:
+          - web-network      
+     web:
+       image: vultr-nginx
+       volumes:
+          - ./:/app
+          - "/etc/localtime:/etc/localtime:ro"
+       restart: always
+       depends_on:
+          - php
+       environment:
+          - NGINX_HOST=www.hcodecommerce.com.br      
+       ports:
+          - 80:80
+       networks:
+          - web-network    
+     mysql:
+       image: mysql:5.7.21
+       volumes:
+          - ./:/app
+          - dbdata:/var/lib/mysql
+          - "/etc/localtime:/etc/localtime:ro"
+       restart: always  
+       environment:    
+          - MYSQL_DATABASE=db_ecommerce
+          - MYSQL_ROOT_PASSWORD=root
+       ports:
+          - "3309:3306"
+       working_dir: /app
+       networks:
+          - web-network
+       
+volumes:
+      dbdata:
+
+networks:
+      web-network:
+          driver: bridge
